@@ -1,0 +1,306 @@
+<html>
+<body>
+
+
+Enter Husband Income (for the year of assessment)   <input type="number" id="husband_input">
+<br>
+<br>
+Enter Wife Income (for the year of assessment) &nbsp &nbsp &nbsp <input type="number" id="wife_input">
+<br>
+<br>
+&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp 
+&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp 
+&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp 
+<button id="cal" onclick="cal_output()">Calculate</button>
+
+
+
+<br>
+<br>
+<hr>
+<h1><u>Separate Assessment</u></h1>
+<p id="se_husband_income"></p></u>
+<p id="se_husband_mpf"></p>
+<p id="se_husband_basic"></p>
+<p id="se_husband_net_char_income"></p>
+<p id="se_husband_tax_payable"></p>
+<br>
+<p id="se_wife_income"></p></u>
+<p id="se_wife_mpf"></p>
+<p id="se_wife_basic"></p>
+<p id="se_wife_net_char_income"></p>
+<p id="se_wife_tax_payable"></p>
+<br>
+<p id="se_total_tax_payable"></p>
+<hr>
+<h1><u>Joint Assessment</u></h1>
+<p id="jo_total_income"></p></u>
+<p id="jo_total_mpf"></p>
+<br>
+<p id="jo_basic"></p>
+<p id="jo_net_char_income"></p>
+<br>
+<p id="jo_total_tax_payable"></p>
+<hr>
+<br>
+*Recommendation: <span id="jo_recommend" style="color:blue"></span>
+<br>
+<br>
+<br>
+
+
+
+<script>
+function cal_output()
+{
+if (String(document.getElementById("husband_input").value) == "" || String(document.getElementById("wife_input").value) == "") 
+   {alert("Please enter both husband and wife income!")}
+
+else if (document.getElementById("husband_input").value < 0 || document.getElementById("wife_input").value < 0
+      || Number.isInteger(Number(document.getElementById("husband_input").value)) == false || Number.isInteger(Number(document.getElementById("wife_input").value)) == false) 
+   {alert("Please enter 0 or positive integer only!")}
+
+else {
+     var se_total_tax_payable = 0
+     var jo_total_tax_payable = 0
+
+
+    //Separate:
+    //Husband Calculation
+    var husband_income = Number(document.getElementById("husband_input").value)
+    document.getElementById("se_husband_income").innerHTML = "Husband Income:   <u>$" + husband_income.toLocaleString() + "</u>"     
+
+    husband_mpf = Math.min(husband_income*0.05, 18000) // capped at 18000
+    document.getElementById("se_husband_mpf").innerHTML = "Husband MPF:   <u>$" + husband_mpf.toLocaleString() + "</u>"   
+
+    document.getElementById("se_husband_basic").innerHTML = "Husband Basic Allowance:   <u>$132,000</u>"  
+
+    var husband_net_char_income = husband_income - husband_mpf - 132000
+    if (husband_net_char_income > 0)
+    {document.getElementById("se_husband_net_char_income").innerHTML = "Husband Net Chargeable Income:   <u>$" + husband_net_char_income.toLocaleString() + "</u>"
+     var husband_normal_tax = 0
+     var husband_standardr_tax = 0
+
+    if (husband_net_char_income - 50000 > 0) 
+      {
+        husband_normal_tax = husband_normal_tax + 1000
+        if (husband_net_char_income - 100000 > 0) 
+          {
+           husband_normal_tax = husband_normal_tax + 3000
+           if (husband_net_char_income - 150000 > 0) 
+             {
+              husband_normal_tax = husband_normal_tax + 5000              
+              if (husband_net_char_income - 200000 > 0) 
+                {
+                 husband_normal_tax = husband_normal_tax + 7000      
+                 husband_normal_tax = husband_normal_tax + (husband_net_char_income - 200000)*0.17                    
+                }
+              else 
+                {
+                 husband_normal_tax = husband_normal_tax + (husband_net_char_income - 150000)*0.14       
+                } 
+            }
+            else 
+            {
+             husband_normal_tax = husband_normal_tax + (husband_net_char_income - 100000)*0.1        
+            }          
+          }
+      else 
+        {
+         husband_normal_tax = husband_normal_tax + (husband_net_char_income - 50000)*0.06        
+        }
+    }
+    else 
+    {
+     husband_normal_tax = husband_net_char_income*0.02       
+    }
+
+    husband_standardr_tax = (husband_income - husband_mpf)*0.15
+
+
+    //Choose normal tax or standard rate tax
+    if (husband_standardr_tax < husband_normal_tax){
+      husband_tax_payable = Math.floor(husband_standardr_tax)
+      document.getElementById("se_husband_tax_payable").innerHTML = "Husband Tax Payable:   <u>$" + husband_tax_payable.toLocaleString() + "</u> <span style='color: red'>(*At Standard Rate)</span>"
+      }
+    else
+      {
+      husband_tax_payable = Math.floor(husband_normal_tax)
+      document.getElementById("se_husband_tax_payable").innerHTML = "Husband Tax Payable:   <u>$" + husband_tax_payable.toLocaleString() + "</u>"           
+      }
+  }
+    
+  else
+    {husband_net_char_income = 0
+     husband_tax_payable = 0
+     document.getElementById("se_husband_net_char_income").innerHTML = "Husband Net Chargeable Income:   <u>$" + husband_net_char_income + "</u>"
+     document.getElementById("se_husband_tax_payable").innerHTML = "Husband Tax Payable:   <u>$" + husband_tax_payable + "</u>"
+    } 
+
+    se_total_tax_payable = se_total_tax_payable + husband_tax_payable
+  
+
+
+    //Wife Calculation  
+    var wife_income = Number(document.getElementById("wife_input").value)
+    document.getElementById("se_wife_income").innerHTML = "Wife Income:   <u>$" + wife_income.toLocaleString() + "</u>"
+
+    wife_mpf = Math.min(wife_income*0.05, 18000) // capped at 18000
+    document.getElementById("se_wife_mpf").innerHTML = "Wife MPF:   <u>$" + wife_mpf.toLocaleString() + "</u>" 
+
+    document.getElementById("se_wife_basic").innerHTML = "Wife Basic Allowance:   <u>$132,000</u>"  
+
+    var wife_net_char_income = wife_income - wife_mpf - 132000
+    if (wife_net_char_income > 0)
+      {document.getElementById("se_wife_net_char_income").innerHTML = "Wife Net Chargeable Income:   <u>$" + wife_net_char_income.toLocaleString() + "</u>"
+    
+    var wife_normal_tax = 0 
+    var wife_standardr_tax = 0
+
+    if (wife_net_char_income - 50000 > 0) 
+      {
+        wife_normal_tax = wife_normal_tax + 1000
+        if (wife_net_char_income - 100000 > 0) 
+          {
+           wife_normal_tax = wife_normal_tax + 3000
+           if (wife_net_char_income - 150000 > 0) 
+             {
+              wife_normal_tax = wife_normal_tax + 5000              
+              if (wife_net_char_income - 200000 > 0) 
+                {
+                 wife_normal_tax = wife_normal_tax + 7000      
+                 wife_normal_tax = wife_normal_tax + (wife_net_char_income - 200000)*0.17                    
+                }
+              else 
+                {
+                 wife_normal_tax = wife_normal_tax + (wife_net_char_income - 150000)*0.14        
+                } 
+            }
+            else 
+            {
+             wife_normal_tax = wife_normal_tax + (wife_net_char_income - 100000)*0.1       
+            }          
+          }
+      else 
+        {
+         wife_normal_tax = wife_normal_tax + (wife_net_char_income - 50000)*0.06       
+        }
+    }
+    else 
+    {
+     wife_normal_tax = wife_net_char_income*0.02       
+    }
+
+    wife_standardr_tax = (wife_income - wife_mpf)*0.15
+
+
+    //Choose normal tax or standard rate tax
+    if (wife_standardr_tax < wife_normal_tax){
+      wife_tax_payable = Math.floor(wife_standardr_tax)
+      document.getElementById("se_wife_tax_payable").innerHTML = "Wife Tax Payable:   <u>$" + wife_tax_payable.toLocaleString() + "</u> <span style='color: red'>(*At Standard Rate)</span>"
+      }
+    else
+      {
+      wife_tax_payable = Math.floor(wife_normal_tax)
+      document.getElementById("se_wife_tax_payable").innerHTML = "Wife Tax Payable:   <u>$" + wife_tax_payable.toLocaleString() + "</u>"           
+      }
+  }
+
+  else
+    {wife_net_char_income = 0
+     wife_tax_payable = 0
+     document.getElementById("se_wife_net_char_income").innerHTML = "Wife Net Chargeable Income:   <u>$" + wife_net_char_income + "</u>"
+     document.getElementById("se_wife_tax_payable").innerHTML = "Wife Tax Payable:   <u>$" + wife_tax_payable + "</u>"
+    } 
+    
+    se_total_tax_payable = se_total_tax_payable + wife_tax_payable
+
+    document.getElementById("se_total_tax_payable").innerHTML = "<b>Total Tax Payable:   <u style='color: red'>$" + se_total_tax_payable.toLocaleString() + "</u></b>"
+
+
+     //Joint:         
+     jo_total_income = husband_income + wife_income
+     jo_total_mpf = husband_mpf + wife_mpf
+     document.getElementById("jo_total_income").innerHTML = "Total Income:   <u>$" + jo_total_income.toLocaleString() + "</u>"
+     document.getElementById("jo_total_mpf").innerHTML = "Total MPF:   <u>$" + jo_total_mpf.toLocaleString() + "</u>"
+     document.getElementById("jo_basic").innerHTML = "Basic Allowance:   <u>$264,000</u>"
+
+     jo_net_char_income = jo_total_income - jo_total_mpf - 264000
+
+    if (jo_net_char_income > 0)
+    {document.getElementById("jo_net_char_income").innerHTML = "Net Chargeable Income:   <u>$" + jo_net_char_income.toLocaleString() + "</u>"
+     var jo_normal_tax = 0
+     var jo_standardr_tax = 0
+
+    if (jo_net_char_income - 50000 > 0) 
+      {
+        jo_normal_tax = jo_normal_tax + 1000
+        if (jo_net_char_income - 100000 > 0) 
+          {
+           jo_normal_tax = jo_normal_tax + 3000
+           if (jo_net_char_income - 150000 > 0) 
+             {
+              jo_normal_tax = jo_normal_tax + 5000              
+              if (jo_net_char_income - 200000 > 0) 
+                {
+                 jo_normal_tax = jo_normal_tax + 7000      
+                 jo_normal_tax = jo_normal_tax + (jo_net_char_income - 200000)*0.17                    
+                }
+              else 
+                {
+                 jo_normal_tax = jo_normal_tax + (jo_net_char_income - 150000)*0.14        
+                } 
+            }
+            else 
+            {
+             jo_normal_tax = jo_normal_tax + (jo_net_char_income - 100000)*0.1       
+            }          
+          }
+      else 
+        {
+         jo_normal_tax = jo_normal_tax + (jo_net_char_income - 50000)*0.06       
+        }
+    }
+    else 
+    {
+     jo_normal_tax = jo_net_char_income*0.02       
+    }
+
+    jo_standardr_tax = (jo_total_income - jo_total_mpf)*0.15
+
+
+    //Choose normal tax or standard rate tax
+    if (jo_standardr_tax < jo_normal_tax){
+      jo_total_tax_payable = Math.floor(jo_standardr_tax)
+      document.getElementById("jo_total_tax_payable").innerHTML = "<b>Total Tax Payable:   <span style='color: red'><u>$" 
+      + jo_total_tax_payable.toLocaleString() + "</u> (*At Standard Rate)</span></b>"
+      }
+    else
+      {
+      jo_total_tax_payable = Math.floor(jo_normal_tax)
+      document.getElementById("jo_total_tax_payable").innerHTML = "<b>Total Tax Payable:   <u style='color: red'>$" 
+      + jo_total_tax_payable.toLocaleString() + "</u></b>"           
+      }
+  }
+     
+  else
+    {jo_net_char_income = 0
+     jo_total_tax_payable = 0
+     document.getElementById("jo_net_char_income").innerHTML = "Net Chargeable Income:   <u>$" + jo_net_char_income + "</u>"
+     document.getElementById("jo_total_tax_payable").innerHTML = "<b>Total Tax Payable:   <u style='color:red'>$" + jo_total_tax_payable + "</u></b>"
+    } 
+
+
+  //Recommendation:
+  if (jo_total_tax_payable < se_total_tax_payable)
+    {document.getElementById("jo_recommend").innerHTML = " <a style='color:blue'>Joint assessment is recommended!</a>"}
+  else 
+    {document.getElementById("jo_recommend").innerHTML = " <a style='color:blue'>Joint assessment is not necessary!</a>"}
+
+  }
+}
+</script>
+
+
+</body>
+</html>
