@@ -1,0 +1,9 @@
+Test Driven - Jest (a popular test driven for javascript)
+Install steps:
+
+1. Download Node.js
+2. Install Jest globally using command "npm install -g jest"
+3. Put ".package-lock.json", "package.json" and "cases.test" files into a same directory
+4. Type command "npm test" in that directory to test all cases
+
+ 
